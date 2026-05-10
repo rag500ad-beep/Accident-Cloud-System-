@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Dashboard</title>
+</head>
+
+<html>
+
+<body>
+
+    <h2>Dashboard</h2>
+
+    <div id="data"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9,6,1/firebase-firestore.js"></script>
+    <script type="module" src="script.js"></script>
+
+    <h2>Accident statistics</h2>
+
+    <P>
+        Number of accident:
+        <span id="count">0</span>
+    </p>
+
+    <script>
+        const db = firebase.firestore();
+
+        db.collection("accidents").onSnapshot((snapshot) => {
+            document.getElementById("count").innerText = snapshot.size;
+        });
+    </script>
+
+</body>
+
+</html>

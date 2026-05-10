@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة حوادث المرور</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2330;
+      --border: #30363d;
+      --accent: #f78166;
+      --accent2: #388bfd;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --danger: #f85149;
+      --success: #3fb950;
+      --warning: #d29922;
+      --radius: 10px;
+    }
+
+    body {
+      font-family: 'IBM Plex Sans Arabic', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 800px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 2.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #f78166, #d7263d);
+      border-radius: var(--radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+    }
+
+    .stat-card .label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .stat-card .value {
+      font-size: 1.6rem;
+      font-weight: 600;
+    }
+
+    .stat-card.total .value { color: var(--accent2); }
+    .stat-card.today .value { color: var(--warning); }
+    .stat-card.severe .value { color: var(--danger); }
+
+    .form-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-card h2 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 1.2rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full { grid-column: 1 / -1; }
+
+    label {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 9px 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent2);
+    }
+
+    select option { background: var(--surface2); }
+    textarea { resize: vertical; min-height: 72px; }
+
+    .btn-add {
+      width: 100%;
+      background: var(--accent);
+      border: none;
+      border-radius: 7px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      padding: 10px;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.1s;
+      margin-top: 4px;
+    }
+
+    .btn-add:hover { opacity: 0.88; }
+    .btn-add:active { transform: scale(0.98); }
+
+    .list-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .list-header h2 {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 0.78rem;
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: var(--surface2);
+      border-color: var(--accent2);
+      color: var(--accent2);
+    }
+
+    #accidents-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .accident-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      animation: slideIn 0.3s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .accident-info { flex: 1; min-width: 0; }
+
+    .accident-top {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .severity-badge {
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+
+    .severity-badge.خفيف  { background: rgba(63,185,80,.15); color: var(--success); }
+    .severity-badge.متوسط { background: rgba(210,153,34,.15); color: var(--warning); }
+    .severity-badge.خطير  { background: rgba(248,81,73,.15); color: var(--danger); }
+
+    .accident-type {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .accident-location {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .accident-notes {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    .accident-meta {
+      text-align: left;
+      flex-shrink: 0;
+    }
+
+    .accident-time {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.78rem;
+      padding: 4px 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-delete:hover { border-color: var(--danger); color: var(--danger); }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-state .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .empty-state p { font-size: 0.9rem; }
+
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.88rem;
+      padding: 10px 18px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 540px) {
+      .stats { grid-template-columns: 1fr 1fr; }
+      .form-grid { grid-template-columns: 1fr; }
+      .filter-bar { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <header>
+    <div class="logo">🚨</div>
+    <div>
+      <h1>نظام إدارة حوادث المرور</h1>
+      <p>تسجيل ومتابعة الحوادث المرورية</p>
+    </div>
+  </header>
+
+  <div class="stats">
+    <div class="stat-card total">
+      <div class="label">إجمالي الحوادث</div>
+      <div class="value" id="stat-total">0</div>
+    </div>
+    <div class="stat-card today">
+      <div class="label">اليوم</div>
+      <div class="value" id="stat-today">0</div>
+    </div>
+    <div class="stat-card severe">
+      <div class="label">حوادث خطيرة</div>
+      <div class="value" id="stat-severe">0</div>
+    </div>
+  </div>
+
+  <div class="form-card">
+    <h2>➕ تسجيل حادث جديد</h2>
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="location">الموقع</label>
+        <input type="text" id="location" placeholder="مثال: شارع الملك فهد">
+      </div>
+      <div class="form-group">
+        <label for="type">نوع الحادث</label>
+        <input type="text" id="type" placeholder="مثال: تصادم خلفي">
+      </div>
+      <div class="form-group">
+        <label for="severity">درجة الخطورة</label>
+        <select id="severity">
+          <option value="خفيف">خفيف</option>
+          <option value="متوسط">متوسط</option>
+          <option value="خطير">خطير</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="vehicles">عدد المركبات</label>
+        <input type="number" id="vehicles" placeholder="0" min="1">
+      </div>
+      <div class="form-group full">
+        <label for="notes">ملاحظات إضافية</label>
+        <textarea id="notes" placeholder="أي تفاصيل إضافية..."></textarea>
+      </div>
+    </div>
+    <button class="btn-add" onclick="addAccident()">تسجيل الحادث</button>
+  </div>
+
+  <div class="list-header">
+    <h2>سجل الحوادث</h2>
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="setFilter('all', this)">الكل</button>
+      <button class="filter-btn" onclick="setFilter('خفيف', this)">خفيف</button>
+      <button class="filter-btn" onclick="setFilter('متوسط', this)">متوسط</button>
+      <button class="filter-btn" onclick="setFilter('خطير', this)">خطير</button>
+    </div>
+  </div>
+
+  <div id="accidents-list"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  let accidents = JSON.parse(localStorage.getItem('accidents') || '[]');
+  let currentFilter = 'all';
+
+  function save() {
+    localStorage.setItem('accidents', JSON.stringify(accidents));
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+
+  function addAccident() {
+    const location = document.getElementById('location').value.trim();
+    const type     = document.getElementById('type').value.trim();
+    const severity = document.getElementById('severity').value;
+    const vehicles = document.getElementById('vehicles').value;
+    const notes    = document.getElementById('notes').value.trim();
+
+    if (!location || !type) {
+      showToast('⚠️ يرجى إدخال الموقع ونوع الحادث');
+      return;
+    }
+
+    const accident = {
+      id: Date.now(),
+      location,
+      type,
+      severity,
+      vehicles: vehicles || '—',
+      notes,
+      time: new Date().toLocaleString('ar-SA', { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' }),
+      date: new Date().toDateString()
+    };
+
+    accidents.unshift(accident);
+    save();
+    renderList();
+    updateStats();
+    showToast('✅ تم تسجيل الحادث بنجاح');
+
+    document.getElementById('location').value = '';
+    document.getElementById('type').value = '';
+    document.getElementById('notes').value = '';
+    document.getElementById('vehicles').value = '';
+  }
+
+  function deleteAccident(id) {
+    accidents = accidents.filter(a => a.id !== id);
+    save();
+    renderList();
+    updateStats();
+    showToast('🗑️ تم حذف الحادث');
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderList();
+  }
+
+  function renderList() {
+    const list = document.getElementById('accidents-list');
+    const filtered = currentFilter === 'all' ? accidents : accidents.filter(a => a.severity === currentFilter);
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="icon">🚗</div><p>لا توجد حوادث مسجلة</p></div>`;
+      return;
+    }
+
+    list.innerHTML = filtered.map(a => `
+      <div class="accident-card">
+        <div class="accident-info">
+          <div class="accident-top">
+            <span class="accident-type">${a.type}</span>
+            <span class="severity-badge ${a.severity}">${a.severity}</span>
+          </div>
+          <div class="accident-location">📍 ${a.location} ${a.vehicles !== '—' ? '· 🚗 ' + a.vehicles + ' مركبات' : ''}</div>
+          ${a.notes ? `<div class="accident-notes">${a.notes}</div>` : ''}
+        </div>
+        <div class="accident-meta">
+          <div class="accident-time">${a.time}</div>
+          <button class="btn-delete" onclick="deleteAccident(${a.id})">حذف</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function updateStats() {
+    const today = new Date().toDateString();
+    document.getElementById('stat-total').textContent  = accidents.length;
+    document.getElementById('stat-today').textContent  = accidents.filter(a => a.date === today).length;
+    document.getElementById('stat-severe').textContent = accidents.filter(a => a.severity === 'خطير').length;
+  }
+
+  renderList();
+  updateStats();
+</script>
+
+</body>
+</html>

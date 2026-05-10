@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — Accident Cloud System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #534AB7;
+      --bg: #EEEDFE;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --muted: #888;
+      --shadow: 0 8px 32px rgba(83,74,183,0.10);
+    }
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    header {
+      background: var(--surface);
+      padding: 0 24px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 1px 0 #e0dff5;
+    }
+    .nav-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      border: 1px solid #e0dff5;
+      margin-left: 5px;
+    }
+    .nav-btn:hover { background: var(--bg); color: var(--primary); }
+    .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    
+    main { padding: 40px 24px; max-width: 1000px; margin: 0 auto; width: 100%; }
+    .welcome-card {
+      background: var(--surface);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 30px;
+    }
+    .stat-item {
+      background: var(--bg);
+      padding: 20px;
+      border-radius: 12px;
+    }
+    .stat-value { font-size: 24px; font-weight: 600; color: var(--primary); }
+    .stat-label { font-size: 12px; color: var(--muted); text-transform: uppercase; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div style="width:30px; height:30px; background:var(--bg); border-radius:6px; display:flex; align-items:center; justify-content:center; color:var(--primary); font-weight:bold;">A</div>
+      <h1 style="font-size:15px;">Accident Cloud</h1>
+    </div>
+    <nav>
+      <a href="dashboard.html" class="nav-btn active">Dashboard</a>
+      <a href="map.html" class="nav-btn">Map</a>
+      <a href="view.html" class="nav-btn">Reports</a>
+      <a href="report.html" class="nav-btn">New Report</a>
+    </nav>
+  </header>
+  <main>
+    <div class="welcome-card">
+      <h2>Welcome to the Dashboard</h2>
+      <p style="color:var(--muted);">Overview of the Accident Cloud System</p>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-value" id="totalReports">...</div>
+          <div class="stat-label">Total Reports</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-value">Active</div>
+          <div class="stat-label">System Status</div>
+        </div>
+      </div>
+      
+      <div style="margin-top:40px;">
+        <a href="report.html" style="background:var(--primary); color:white; padding:12px 24px; border-radius:8px; text-decoration:none; font-weight:500;">Report New Accident</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD5i7LkVRCKg2L2PrzwNm7PeDYKytR-jOc",
+      authDomain: "accident-cloud-system-41ad9.firebaseapp.com",
+      projectId: "accident-cloud-system-41ad9",
+      storageBucket: "accident-cloud-system-41ad9.firebasestorage.app",
+      messagingSenderId: "460550861200",
+      appId: "1:460550861200:web:bd0a77ac5a6b29a52c4315"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    async function loadStats() {
+      const querySnapshot = await getDocs(collection(db, "accidents"));
+      document.getElementById('totalReports').textContent = querySnapshot.size;
+    }
+    loadStats();
+  </script>
+</body>
+</html>

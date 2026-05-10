@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Accident Reports</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #f5f5f5;
+      text-align: center;
+    }
+
+    .card {
+      background: white;
+      margin: 15px auto;
+      padding: 15px;
+      width: 300px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px gray;
+    }
+
+    img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    button {
+      background: red;
+      color: white;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>📊 Accident Reports</h2>
+
+<div id="reports"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔥 Firebase Config (نفس حقك)
+const firebaseConfig = {
+  apiKey: "AIzaSyD5i7LkVRCKg2L2PrzwNm7PeDYKytR-jOc",
+ authDomain: "accident-cloud-system-41ad9.firebaseapp.com",
+ projectId: "accident-cloud-system-41ad9",
+ storageBucket: "accident-cloud-system-41ad9.firebasestorage.app",
+ messagingSenderId: "460550861200",
+ appId: "1:460550861200:web:bd0a77ac5a6b29a52c4315"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🟢 دالة الحذف
+window.deleteReport = async (id) => {
+  await deleteDoc(doc(db, "accidents", id));
+  alert("❌ تم حذف البلاغ");
+  location.reload();
+};
+
+// 🟢 جلب البيانات
+const querySnapshot = await getDocs(collection(db, "accidents"));
+
+querySnapshot.forEach((documento) => {
+  const data = documento.data();
+  const id = documento.id;
+
+  const div = document.createElement("div");
+  div.className = "card";
+
+  div.innerHTML = `
+    <p><b>📍 Location:</b> ${data.lat || ""}, ${data.lng || ""}</p>
+    <p><b>📝 Description:</b> ${data.description || ""}</p>
+    <p><b>📱 Phone:</b> ${data.phone || ""}</p>
+    <p><b>🚗 Type:</b> ${data.type || ""}</p>
+    ${data.image ? `<img src="${data.image}">` : ""}
+    <button onclick="deleteReport('${id}')">🗑️ Delete</button>
+  `;
+
+  document.getElementById("reports").appendChild(div);
+});
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      font-family: 'Sora', sans-serif;
+      background: #EEEDFE;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      width: 380px;
+      padding: 2.5rem 2rem;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(83,74,183,0.10);
+      position: relative;
+      overflow: hidden;
+    }
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #7F77DD, #534AB7, #7F77DD);
+      background-size: 200%;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer {
+      0%   { background-position: 200% center; }
+      100% { background-position: -200% center; }
+    }
+    .logo {
+      width: 44px; height: 44px;
+      background: #EEEDFE;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.4rem;
+    }
+    h2 { font-size: 20px; font-weight: 600; margin: 0 0 4px; color: #1a1a2e; }
+    .sub { font-size: 13px; color: #888; font-weight: 300; margin: 0 0 2rem; }
+    .field { margin-bottom: 1rem; }
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #888;
+      margin-bottom: 6px;
+    }
+    .input-wrap { position: relative; }
+    .input-wrap svg.icon {
+      position: absolute;
+      left: 12px; top: 50%;
+      transform: translateY(-50%);
+      width: 16px; height: 16px;
+      color: #aaa;
+      pointer-events: none;
+    }
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 12px 10px 38px;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      background: #f7f7fb;
+      border: 1px solid #e0dff5;
+      border-radius: 8px;
+      color: #1a1a2e;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input:focus {
+      border-color: #7F77DD;
+      box-shadow: 0 0 0 3px rgba(127,119,221,0.12);
+    }
+    .toggle-pw {
+      position: absolute;
+      right: 10px; top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      color: #aaa;
+      display: flex;
+      align-items: center;
+    }
+    .toggle-pw:hover { color: #534AB7; }
+    button[type="submit"] {
+      width: 100%;
+      padding: 11px;
+      margin-top: 1.4rem;
+      background: #534AB7;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      letter-spacing: 0.02em;
+      transition: background 0.2s, transform 0.1s;
+    }
+    button[type="submit"]:hover  { background: #3C3489; }
+    button[type="submit"]:active { transform: scale(0.98); }
+    button[type="submit"]:disabled { background: #aaa; cursor: not-allowed; }
+    .firebase-msg {
+      margin-top: 1rem;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      display: none;
+      text-align: center;
+    }
+    .firebase-msg.success { background: #e6f9f0; color: #1a7a4a; display: block; }
+    .firebase-msg.fail    { background: #fdeaea; color: #c0392b; display: block; }
+    .footer {
+      margin-top: 1.4rem;
+      text-align: center;
+      font-size: 13px;
+      color: #888;
+    }
+    .footer a { color: #7F77DD; text-decoration: none; font-weight: 500; }
+    .footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         stroke="#534AB7" stroke-width="2" stroke-linecap="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
+  </div>
+
+  <h2>Welcome back</h2>
+  <p class="sub">Sign in to your account to continue</p>
+
+  <form id="loginForm">
+    <div class="field">
+      <label>Email</label>
+      <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
+        <input type="email" id="email" placeholder="you@example.com"
+               autocomplete="email" required>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Password</label>
+      <div class="input-wrap">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <input type="password" id="pwInput" placeholder="••••••••"
+               autocomplete="current-password" required>
+        <button type="button" class="toggle-pw" onclick="togglePw()">
+          <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24"
+               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn">Log in</button>
+  </form>
+
+  <div class="firebase-msg" id="firebaseMsg"></div>
+
+  <p class="footer">Don't have an account? <a href="sign up.html">Sign up</a></p>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword }
+    from "https://www.gstatic.com/firebasejs/11.0.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyD5i7LkVRCKg2L2PrzwNm7PeDYKytR-jOc",
+    authDomain: "accident-cloud-system-41ad9.firebaseapp.com",
+    projectId: "accident-cloud-system-41ad9",
+    storageBucket: "accident-cloud-system-41ad9.firebasestorage.app",
+    messagingSenderId: "460550861200",
+    appId: "1:460550861200:web:bd0a77ac5a6b29a52c4315"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  const msgEl     = document.getElementById('firebaseMsg');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showMsg(text, type) {
+    msgEl.textContent = text;
+    msgEl.className = 'firebase-msg ' + type;
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('pwInput').value;
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Signing in...';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      showMsg('✅ Login successful! Redirecting...', 'success');
+
+      // ✅ بعد الدخول تروحين لصفحة index.html
+      setTimeout(() => { window.location.href = 'index.html'; }, 1500);
+
+    } catch (err) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Log in';
+      const errors = {
+        'auth/user-not-found':     '⚠️ No account found with this email.',
+        'auth/wrong-password':     '⚠️ Incorrect password.',
+        'auth/invalid-email':      '⚠️ Invalid email address.',
+        'auth/invalid-credential': '⚠️ Email or password is incorrect.',
+        'auth/too-many-requests':  '⚠️ Too many attempts. Try again later.',
+      };
+      showMsg(errors[err.code] || '⚠️ ' + err.message, 'fail');
+    }
+  });
+
+  window.togglePw = function() {
+    const inp  = document.getElementById('pwInput');
+    const icon = document.getElementById('eyeIcon');
+    if (inp.type === 'password') {
+      inp.type = 'text';
+      icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+    } else {
+      inp.type = 'password';
+      icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+    }
+  };
+</script>
+
+</body>
+</html>

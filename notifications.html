@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Notifications — Accident Cloud System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ------------------------------------------------------------------ */
+    /*  Design tokens                                                       */
+    /* ------------------------------------------------------------------ */
+    :root {
+      --bg:          #0d0f14;
+      --surface:     #13161e;
+      --surface-2:   #1b1f2b;
+      --border:      #252934;
+      --border-focus:#3a4156;
+      --accent:      #2563eb;
+      --accent-dim:  #1d4ed8;
+      --success:     #059669;
+      --warning:     #d97706;
+      --danger:      #dc2626;
+      --text-primary:#e8eaf0;
+      --text-muted:  #6b7280;
+      --text-dim:    #9ca3af;
+      --mono:        'IBM Plex Mono', monospace;
+      --sans:        'IBM Plex Sans', sans-serif;
+      --radius:      6px;
+      --radius-lg:   10px;
+      --shadow:      0 2px 16px rgba(0,0,0,0.5);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Reset & base                                                        */
+    /* ------------------------------------------------------------------ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 15px; -webkit-font-smoothing: antialiased; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-primary);
+      font-family: var(--sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Layout                                                              */
+    /* ------------------------------------------------------------------ */
+    header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 0 40px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-logo {
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      border-radius: 4px;
+      display: grid;
+      place-items: center;
+    }
+
+    .header-logo svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .header-title {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+      text-transform: uppercase;
+    }
+
+    .header-sub {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.02em;
+    }
+
+    .status-badge {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      padding: 4px 10px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: background 0.3s;
+    }
+
+    .status-dot.active { background: var(--success); box-shadow: 0 0 6px var(--success); }
+
+    main {
+      flex: 1;
+      padding: 40px;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Page heading                                                        */
+    /* ------------------------------------------------------------------ */
+    .page-heading {
+      margin-bottom: 32px;
+    }
+
+    .page-heading h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .page-heading p {
+      font-size: 13px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Section                                                             */
+    /* ------------------------------------------------------------------ */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .section-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .section-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 2px;
+      line-height: 1.5;
+    }
+
+    .section-step {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+      white-space: nowrap;
+    }
+
+    .section-body {
+      padding: 24px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Buttons                                                             */
+    /* ------------------------------------------------------------------ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, opacity 0.15s, transform 0.1s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #ffffff;
+    }
+    .btn-primary:hover:not(:disabled) { background: var(--accent-dim); }
+
+    .btn-success {
+      background: var(--success);
+      color: #ffffff;
+    }
+    .btn-success:hover:not(:disabled) { background: #047857; }
+
+    .btn-warning {
+      background: var(--warning);
+      color: #ffffff;
+    }
+    .btn-warning:hover:not(:disabled) { background: #b45309; }
+
+    .btn-danger {
+      background: var(--danger);
+      color: #ffffff;
+    }
+    .btn-danger:hover:not(:disabled) { background: #b91c1c; }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Status / feedback                                                    */
+    /* ------------------------------------------------------------------ */
+    .feedback {
+      display: none;
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      font-family: var(--mono);
+      font-size: 12px;
+      line-height: 1.5;
+      border-left: 3px solid;
+    }
+
+    .feedback.visible { display: block; }
+
+    .feedback-info    { background: #1e293b; border-color: var(--accent);   color: #93c5fd; }
+    .feedback-success { background: #064e3b; border-color: var(--success);  color: #6ee7b7; }
+    .feedback-error   { background: #450a0a; border-color: var(--danger);   color: #fca5a5; }
+    .feedback-warning { background: #431407; border-color: var(--warning);  color: #fcd34d; }
+
+    /* ------------------------------------------------------------------ */
+    /*  Token display                                                        */
+    /* ------------------------------------------------------------------ */
+    .token-box {
+      display: none;
+      margin-top: 14px;
+    }
+
+    .token-box.visible { display: block; }
+
+    .token-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .token-value {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: #93c5fd;
+      word-break: break-all;
+      line-height: 1.6;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Log                                                                  */
+    /* ------------------------------------------------------------------ */
+    .log-wrapper {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .log-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-toolbar-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .btn-clear {
+      background: none;
+      border: none;
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      cursor: pointer;
+      padding: 2px 6px;
+      border-radius: 3px;
+      transition: color 0.15s, background 0.15s;
+    }
+
+    .btn-clear:hover { color: var(--text-dim); background: var(--border); }
+
+    .log-output {
+      height: 200px;
+      overflow-y: auto;
+      padding: 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.7;
+      color: var(--text-dim);
+    }
+
+    .log-entry { display: flex; gap: 10px; }
+    .log-time  { color: var(--text-muted); flex-shrink: 0; }
+    .log-info    { color: #93c5fd; }
+    .log-success { color: #6ee7b7; }
+    .log-warning { color: #fcd34d; }
+    .log-error   { color: #fca5a5; }
+
+    /* ------------------------------------------------------------------ */
+    /*  Info grid                                                            */
+    /* ------------------------------------------------------------------ */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info-item {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+    }
+
+    .info-item-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .info-item-value {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 100px;
+      font-family: var(--mono);
+      font-size: 11px;
+    }
+
+    .tag-blue   { background: #1e3a5f; color: #93c5fd; }
+    .tag-green  { background: #064e3b; color: #6ee7b7; }
+    .tag-yellow { background: #422006; color: #fcd34d; }
+
+    /* ------------------------------------------------------------------ */
+    /*  Divider                                                              */
+    /* ------------------------------------------------------------------ */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Footer                                                               */
+    /* ------------------------------------------------------------------ */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    footer p {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    /* ------------------------------------------------------------------ */
+    /*  Scrollbar                                                            */
+    /* ------------------------------------------------------------------ */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-focus); border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="header-brand">
+      <div class="header-logo">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <div>
+        <div class="header-title">Accident Cloud System</div>
+        <div class="header-sub">Notifications Module — FCM</div>
+      </div>
+    </div>
+    <div class="status-badge">
+      <div class="status-dot" id="globalStatusDot"></div>
+      <span id="globalStatusText">Not Activated</span>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="page-heading">
+      <h1>Firebase Cloud Messaging — Notifications</h1>
+      <p>Activate push notifications, obtain the device registration token, and run simulation tests for the two primary notification events used in this project.</p>
+    </div>
+
+    <!-- Step 1: Activate -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Step 01</div>
+          <div class="section-title">Request Notification Permission</div>
+          <div class="section-desc">Prompts the browser for notification access and registers this device with Firebase Cloud Messaging.</div>
+        </div>
+        <span class="section-step">notifications.js</span>
+      </div>
+      <div class="section-body">
+        <div class="btn-group">
+          <button class="btn btn-primary" id="btnActivate" onclick="handleActivate()">Activate Notifications</button>
+        </div>
+
+        <div class="feedback" id="activateFeedback"></div>
+
+        <div class="token-box" id="tokenBox">
+          <div class="token-label">FCM Registration Token</div>
+          <div class="token-value" id="tokenValue"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Simulation -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Step 02</div>
+          <div class="section-title">Simulate Notification Events</div>
+          <div class="section-desc">Triggers in-app toast notifications locally. These simulate the two primary FCM events in the system.</div>
+        </div>
+        <span class="section-step">Test Only</span>
+      </div>
+      <div class="section-body">
+        <div class="btn-group">
+          <button class="btn btn-warning" id="btnNewAccident"  onclick="simulateNewAccident()"  disabled>New Accident Reported</button>
+          <button class="btn btn-success" id="btnReportReview" onclick="simulateReportReviewed()" disabled>Report Status Updated</button>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Event Log -->
+        <div class="log-wrapper">
+          <div class="log-toolbar">
+            <span class="log-toolbar-title">Event Log</span>
+            <button class="btn-clear" onclick="clearLog()">Clear</button>
+          </div>
+          <div class="log-output" id="logOutput">
+            <div class="log-entry">
+              <span class="log-time">--:--:--</span>
+              <span class="log-info">Waiting for activation...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Integration reference -->
+    <div class="section">
+      <div class="section-header">
+        <div>
+          <div class="section-label">Step 03</div>
+          <div class="section-title">Integration Reference</div>
+          <div class="section-desc">Add the following snippet to any page that should trigger or receive notifications (e.g. report.html, dashboard.html).</div>
+        </div>
+        <span class="section-step">Reference</span>
+      </div>
+      <div class="section-body">
+        <div class="info-grid">
+          <div class="info-item">
+            <div class="info-item-label">Initialise on page load</div>
+            <div class="info-item-value" style="font-family:var(--mono);font-size:12px;color:#93c5fd;">
+              import { requestNotificationPermission,<br>
+              &nbsp;&nbsp;listenToForegroundNotifications,<br>
+              &nbsp;&nbsp;listenToAccidentEvents } from './notifications.js';<br><br>
+              requestNotificationPermission();<br>
+              listenToForegroundNotifications();<br>
+              listenToAccidentEvents();
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Required files in project root</div>
+            <div class="info-item-value" style="font-family:var(--mono);font-size:12px;line-height:2;">
+              <span class="tag tag-blue">firebase-messaging-sw.js</span><br>
+              <span class="tag tag-green">notifications.js</span><br>
+              <span class="tag tag-yellow">notifications.html</span>
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Firestore collection — accidents</div>
+            <div class="info-item-value" style="font-family:var(--mono);font-size:12px;color:#6ee7b7;">
+              Required fields:<br>
+              location: string<br>
+              status: string ("reviewed")<br>
+              createdAt: Timestamp
+            </div>
+          </div>
+          <div class="info-item">
+            <div class="info-item-label">Hosting requirement</div>
+            <div class="info-item-value" style="font-family:var(--mono);font-size:12px;color:#fcd34d;">
+              FCM requires HTTPS.<br>
+              GitHub Pages provides HTTPS.<br>
+              localhost is also supported.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <p>Accident Cloud System — Notifications Component</p>
+    <p>FCM + Firebase Firestore + GitHub Pages</p>
+  </footer>
+
+  <!-- ------------------------------------------------------------------ -->
+  <!-- Application Logic                                                    -->
+  <!-- ------------------------------------------------------------------ -->
+  <script type="module">
+    import {
+      requestNotificationPermission,
+      listenToForegroundNotifications,
+      listenToAccidentEvents,
+      showToastNotification
+    } from './notifications.js';
+
+    // ---- Logging -------------------------------------------------------
+    function log(message, type = 'info') {
+      const output = document.getElementById('logOutput');
+      const now    = new Date();
+      const time   = now.toTimeString().slice(0, 8);
+
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `
+        <span class="log-time">${time}</span>
+        <span class="log-${type}">${message}</span>
+      `;
+
+      // Remove placeholder if present
+      const placeholder = output.querySelector('.log-info');
+      if (placeholder && placeholder.textContent === 'Waiting for activation...') {
+        placeholder.closest('.log-entry')?.remove();
+      }
+
+      output.appendChild(entry);
+      output.scrollTop = output.scrollHeight;
+    }
+
+    window.clearLog = function() {
+      document.getElementById('logOutput').innerHTML = '';
+    };
+
+    // ---- Feedback helper -----------------------------------------------
+    function setFeedback(id, message, type) {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.className   = `feedback visible feedback-${type}`;
+    }
+
+    // ---- Global status -------------------------------------------------
+    function setGlobalStatus(active) {
+      document.getElementById('globalStatusDot').className = `status-dot ${active ? 'active' : ''}`;
+      document.getElementById('globalStatusText').textContent = active ? 'Active' : 'Not Activated';
+    }
+
+    // ---- Activate ------------------------------------------------------
+    window.handleActivate = async function() {
+      const btn = document.getElementById('btnActivate');
+      btn.disabled  = true;
+      btn.textContent = 'Requesting permission...';
+
+      setFeedback('activateFeedback', 'Requesting notification permission from the browser...', 'info');
+      log('Requesting notification permission...', 'info');
+
+      try {
+        const token = await requestNotificationPermission();
+
+        if (token) {
+          setFeedback('activateFeedback',
+            'Notification permission granted. FCM registration token retrieved and saved to Firestore.',
+            'success');
+
+          const tokenBox   = document.getElementById('tokenBox');
+          const tokenValue = document.getElementById('tokenValue');
+          tokenBox.classList.add('visible');
+          tokenValue.textContent = token;
+
+          log('Permission granted.', 'success');
+          log(`Token: ${token.slice(0, 40)}...`, 'info');
+
+          setGlobalStatus(true);
+
+          // Enable simulation buttons
+          document.getElementById('btnNewAccident').disabled  = false;
+          document.getElementById('btnReportReview').disabled = false;
+
+          // Start listeners
+          listenToForegroundNotifications();
+          listenToAccidentEvents();
+
+          log('Foreground listener active.', 'success');
+          log('Firestore accident listener active.', 'success');
+
+          btn.textContent = 'Notifications Active';
+        } else {
+          setFeedback('activateFeedback',
+            'Permission was denied by the user or no token could be retrieved. Ensure you are running on HTTPS (GitHub Pages or localhost).',
+            'error');
+          log('Permission denied or token unavailable.', 'error');
+          btn.disabled    = false;
+          btn.textContent = 'Retry Activation';
+        }
+      } catch (err) {
+        setFeedback('activateFeedback', `Error: ${err.message}`, 'error');
+        log(`Error: ${err.message}`, 'error');
+        btn.disabled    = false;
+        btn.textContent = 'Retry Activation';
+      }
+    };
+
+    // ---- Simulations ---------------------------------------------------
+    window.simulateNewAccident = function() {
+      showToastNotification(
+        'New Accident Reported',
+        'A new accident report has been submitted and is pending review.',
+        'warning'
+      );
+      log('Simulation triggered: New accident reported.', 'warning');
+    };
+
+    window.simulateReportReviewed = function() {
+      showToastNotification(
+        'Report Status Updated',
+        'Your accident report has been reviewed by the administration.',
+        'success'
+      );
+      log('Simulation triggered: Report marked as reviewed.', 'success');
+    };
+  </script>
+
+</body>
+</html>
